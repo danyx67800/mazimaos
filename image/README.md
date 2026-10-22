@@ -35,7 +35,9 @@ so the first browser visit shows a certificate warning until the local root CA
 is trusted.
 
 The live session uses the standard Debian live credentials (`user` / `live` by
-default). On the console:
+default). `mazima` is a service account with `/usr/sbin/nologin`; do not use it
+for console login. If the console asks for a login and `user` is rejected, the
+image is missing `user-setup` and must be rebuilt. On the console:
 
 ```sh
 sudo mazimactl setup-token --config /etc/mazima/config.json
