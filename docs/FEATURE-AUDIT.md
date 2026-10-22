@@ -21,13 +21,13 @@ Status values:
 | Full audit log | `make audit` → `docs/evidence/feature-audit.txt` |
 | PWA check | E2E asserts active service worker, scope and `mazima-shell-v2` cache |
 | OTA bundle | `./scripts/release.sh 0.1.0-rc.3` (manifest + Ed25519 signature + verification) |
-| Published prerelease | [`v0.1.0-rc.2`](https://github.com/danyx67800/mazimaos/releases/tag/v0.1.0-rc.2): ISO 1,302,233,088 bytes, OTA bundle and signature; `rc.3` guided-setup ISO pending |
+| Published prerelease | [`v0.1.0-rc.3`](https://github.com/danyx67800/mazimaos/releases/tag/v0.1.0-rc.3): ISO 1,302,233,088 bytes (sha256 `16c5aa7a...`), beta OTA bundle `fa5210c3...` (`5513127` bytes); signature reverified after download |
 | Store catalog | `go test -count=1 ./internal/dockerstore -run TestBundledCatalogManifests` |
 | Caddy snippet split | `go test ./internal/proxy -run TestRegenerateSeparatesPathAndAliasSnippets` |
 | Backup argument flow | Stubbed `restic` exercised `scripts/backup.sh`; real repo/restore not run |
 | CI | GitHub Actions run [39781882015](https://github.com/danyx67800/mazimaos/actions/runs/39781882015) passed (8m4s) |
 | Live-build config | `lb config` passed in a Debian trixie container (amd64 config generated on arm64) |
-| ISO build | GitHub Actions run [39812732075](https://github.com/danyx67800/mazimaos/actions/runs/39812732075) built `mazima-0.1.0-rc.2-amd64.iso` (1.3G) with `user-setup` and verified its SHA-256; boot not tested |
+| ISO build | GitHub Actions run [39819407265](https://github.com/danyx67800/mazimaos/actions/runs/39819407265) built `mazima-0.1.0-rc.3-amd64.iso` (1.3G) with `user-setup`, `whiptail` and `mazima-setup`; checksum verified, boot not tested |
 | Guided setup script | Stub `whiptail` + real `mazimad` created an admin, removed `setup.token`, and produced the expected API payload; `tty1` boot path not tested |
 | Manual matrix | [MANUAL-TESTING.md](MANUAL-TESTING.md) |
 

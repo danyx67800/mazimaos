@@ -11,7 +11,7 @@ These decisions must be resolved before a 1.0.0 release.
    `.github/workflows/release.yml`) and a development key was generated outside
    the repo. Still open: production key ownership, secret storage, rotation and
    revocation. The image workflow reads `MAZIMA_OTA_PUBLIC_KEY`; the local
-   build script reads `OTA_PUBLIC_KEY`. The published `v0.1.0-rc.2` bundle is
+   build script reads `OTA_PUBLIC_KEY`. The published `v0.1.0-rc.3` bundle is
    signed with the development key.
 4. **Tailscale Funnel** — public Funnel activation needs explicit approval and
    a reviewed exposure policy. Serve-only is the safer default.
