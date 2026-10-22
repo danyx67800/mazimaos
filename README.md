@@ -4,7 +4,7 @@
 
 MazimaOS is a browser-controlled personal cloud OS for mini-PCs and home servers. A single Go daemon serves the desktop UI, Docker app management, streamed Linux applications, system telemetry, updates and Tailscale access.
 
-> **Status: pre-release (`0.1.0-dev`).** The UI and core daemon paths are usable, but this repository is **not** a verified 1.0.0 release. Streaming, signed OTA updates, Tailscale Serve/Funnel, app installation and the installable Linux image require hardware or credentials that are not available in this workspace. See [docs/FEATURE-AUDIT.md](docs/FEATURE-AUDIT.md) and [docs/MANUAL-TESTING.md](docs/MANUAL-TESTING.md) before deploying.
+> **Status: pre-release (`0.1.0-rc.1`).** The UI and core daemon paths are usable, but this repository is **not** a verified 1.0.0 release. The [GitHub prerelease](https://github.com/danyx67800/mazimaos/releases/tag/v0.1.0-rc.1) includes a checksum-verified x86_64 live ISO and a signed OTA bundle; the ISO has not been boot-tested. Streaming, signed OTA updates, Tailscale Serve/Funnel and app installation require hardware or credentials that are not available in this workspace. See [docs/FEATURE-AUDIT.md](docs/FEATURE-AUDIT.md) and [docs/MANUAL-TESTING.md](docs/MANUAL-TESTING.md) before deploying.
 
 ## Quick start
 
@@ -35,6 +35,9 @@ The end-to-end test starts its own daemon on `127.0.0.1:18090`, completes first-
 ./scripts/release.sh 0.1.0        # local signed bundle + manifest (dry run)
 OTA_PUBLIC_KEY="$(cat signing/ota.pub)" ./image/build.sh
 ```
+
+The `Image` GitHub Actions workflow builds the Debian ISO on an x86_64 runner
+and can publish it as a prerelease; see [docs/RELEASING.md](docs/RELEASING.md).
 
 `scripts/release.sh` cross-compiles `linux/amd64`, embeds the OTA public key,
 creates `dist/mazima-<version>-linux-amd64.tar.gz`, signs the manifest and

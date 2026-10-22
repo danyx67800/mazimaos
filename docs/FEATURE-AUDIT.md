@@ -1,7 +1,7 @@
 # Feature audit
 
 Audit date: 2026-10-22
-Target: `0.1.0-dev` (do not tag `v1.0.0` until the gaps below are closed)
+Target: `0.1.0-rc.1` (do not tag `v1.0.0` until the gaps below are closed)
 
 Status values:
 
@@ -20,7 +20,8 @@ Status values:
 | Browser E2E | `npm run test:e2e` |
 | Full audit log | `make audit` → `docs/evidence/feature-audit.txt` |
 | PWA check | E2E asserts active service worker, scope and `mazima-shell-v2` cache |
-| OTA bundle | `./scripts/release.sh 0.1.0` (manifest + Ed25519 signature + verification) |
+| OTA bundle | `./scripts/release.sh 0.1.0-rc.1` (manifest + Ed25519 signature + verification) |
+| Published prerelease | [`v0.1.0-rc.1`](https://github.com/danyx67800/mazimaos/releases/tag/v0.1.0-rc.1): ISO 1,302,233,088 bytes, OTA bundle and signature; manifest reverified after download |
 | Store catalog | `go test -count=1 ./internal/dockerstore -run TestBundledCatalogManifests` |
 | Caddy snippet split | `go test ./internal/proxy -run TestRegenerateSeparatesPathAndAliasSnippets` |
 | Backup argument flow | Stubbed `restic` exercised `scripts/backup.sh`; real repo/restore not run |
@@ -53,7 +54,7 @@ Status values:
 | Tailscale status/login/Serve/Funnel | NON VERIFICATO | No tailnet credentials or Funnel approval |
 | Linux app sessions and streamed input | NON VERIFICATO | Cross-build succeeds; runtime needs Xvfb, ffmpeg, xdotool, xclip/xsel on Linux |
 | Update manifest signing and verification | VERIFICATO | `scripts/release.sh` produces a signed manifest and `mazimaota verify` accepts it |
-| Update check/install/rollback | NON VERIFICATO | No published release; install and rollback not exercised |
+| Update check/install/rollback | NON VERIFICATO | Prerelease published; install and rollback not exercised |
 | Audit log read, redaction and pagination | PARZIALE | Unit tests cover redaction and pagination; UI reads events |
 | App catalog schema and compose policy | VERIFICATO | `TestBundledCatalogManifests` validates the bundled File Browser manifest |
 | App install/remove through Caddy | PARZIALE | Manifest/compose validate; Docker Compose plugin is broken on the audit host and Caddy is not installed |
@@ -78,7 +79,7 @@ Status values:
 ## Release blockers
 
 1. Run the Linux streaming integration on a supported host and record evidence.
-2. Move the OTA private key into the release secret store, build a real signed release, and test install plus rollback.
+2. Replace the development OTA key with a production-owned key, store it in the release secret store, and test install plus rollback against the published prerelease.
 3. Authenticate Tailscale and verify Serve; verify Funnel only with explicit approval.
 4. Boot the built ISO on x86_64 hardware or a VM in both UEFI and legacy mode.
 5. Install `restic` and verify a restore, not only a backup.
