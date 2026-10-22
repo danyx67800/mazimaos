@@ -1,0 +1,88 @@
+name: Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version without the leading v (e.g. 1.0.0 or 0.1.0-rc.1)"
+        required: true
+        default: "0.1.0-rc.1"
+        type: string
+      publish:
+        description: "Create or update a GitHub prerelease with the ISO"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  iso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build ISO in Debian trixie
+        env:
+          VERSION: ${{ inputs.version }}
+          OTA_PUBLIC_KEY: ${{ secrets.MAZIMA_OTA_PUBLIC_KEY }}
+        run: |
+          set -euo pipefail
+          df -h /
+          docker run --rm --privileged \
+            --volume "$GITHUB_WORKSPACE:/src" \
+            --workdir /src \
+            --env VERSION \
+            --env OTA_PUBLIC_KEY \
+            golang:1.26-trixie bash -c '
+              set -euo pipefail
+              export PATH="/usr/local/go/bin:$PATH"
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y live-build
+              ./image/build.sh
+            '
+          df -h /
+
+      - name: Verify ISO checksum
+        run: |
+          set -euo pipefail
+          ls -lh dist
+          cd dist
+          sha256sum -c ./*.iso.sha256
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mazima-${{ inputs.version }}-amd64-iso
+          path: |
+            dist/*.iso
+            dist/*.iso.sha256
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Publish prerelease
+        if: inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          asset="dist/mazima-${VERSION}-amd64.iso"
+          checksum="${asset}.sha256"
+          notes="dist/release-notes.md"
+          cat > "$notes" <<EOF
+          MazimaOS ${VERSION} image prerelease.
+
+          This is an unsigned-by-hardware-test live ISO. See docs/MANUAL-TESTING.md
+          before installing or exposing it to a network.
+          EOF
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            gh release upload "v${VERSION}" "$asset" "$checksum" --clobber
+          else
+            gh release create "v${VERSION}" "$asset" "$checksum" \
+              --title "MazimaOS ${VERSION}" \
+              --notes-file "$notes" \
+              --prerelease
+          fi
