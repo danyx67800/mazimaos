@@ -24,6 +24,8 @@ Status values:
 | Store catalog | `go test -count=1 ./internal/dockerstore -run TestBundledCatalogManifests` |
 | Caddy snippet split | `go test ./internal/proxy -run TestRegenerateSeparatesPathAndAliasSnippets` |
 | Backup argument flow | Stubbed `restic` exercised `scripts/backup.sh`; real repo/restore not run |
+| CI | GitHub Actions run [39781882015](https://github.com/danyx67800/mazimaos/actions/runs/39781882015) passed (8m4s) |
+| Live-build config | `lb config` passed in a Debian trixie container (amd64 config generated on arm64); ISO not built |
 | Manual matrix | [MANUAL-TESTING.md](MANUAL-TESTING.md) |
 
 ## Matrix
@@ -56,9 +58,9 @@ Status values:
 | App install/remove through Caddy | PARZIALE | Manifest/compose validate; Docker Compose plugin is broken on the audit host and Caddy is not installed |
 | Caddy path/alias generation | PARZIALE | Unit test verifies separate `apps.caddy`/`apps-aliases.caddy`; no live reload tested |
 | Backups | PARZIALE | Script argument flow tested with a stub; `restic` is not installed and restore was not run |
-| Debian live image and first boot | NON VERIFICATO | Configs and build script exist; no ISO was built or booted |
+| Debian live image and first boot | NON VERIFICATO | Configs, `lb config` and build script exist; no ISO was built or booted |
 | x86_64 hardware and GPU telemetry | NON VERIFICATO | Audit host is ARM64 macOS |
-| CI pipeline | PARZIALE | Workflow added; it has not run on GitHub yet |
+| CI pipeline | VERIFICATO | GitHub Actions run [39781882015](https://github.com/danyx67800/mazimaos/actions/runs/39781882015) passed |
 
 ## Known defects fixed during this audit
 
@@ -80,5 +82,4 @@ Status values:
 4. Build and boot the Debian image on x86_64 hardware or a VM.
 5. Install `restic` and verify a restore, not only a backup.
 6. Exercise app install through Caddy with a real Docker host.
-7. Run the CI workflow on GitHub and attach the result.
-8. Resolve the decisions in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md), especially the license.
+7. Resolve the decisions in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md), especially the license.

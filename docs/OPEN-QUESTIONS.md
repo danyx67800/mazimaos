@@ -4,8 +4,9 @@ These decisions must be resolved before a 1.0.0 release.
 
 1. **License** — no license file exists. Choose one before publishing.
 2. **Repository visibility** — **RESOLVED 2026-10-22**: the owner approved a
-   public GitHub repository. The intended remote is
-   `danyx67800/mazimaos`, but it has not been created or pushed yet.
+   public GitHub repository. It is live at
+   <https://github.com/danyx67800/mazimaos>; the initial commit was pushed to
+   `main` and CI run 39781882015 passed.
 3. **Update signing** — tooling exists (`mazimaota`, `scripts/release.sh`,
    `.github/workflows/release.yml`) and a development key was generated outside
    the repo. Still open: production key ownership, secret storage, rotation and

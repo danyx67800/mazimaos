@@ -1,5 +1,7 @@
 # MazimaOS
 
+[![CI](https://github.com/danyx67800/mazimaos/actions/workflows/ci.yml/badge.svg)](https://github.com/danyx67800/mazimaos/actions/workflows/ci.yml)
+
 MazimaOS is a browser-controlled personal cloud OS for mini-PCs and home servers. A single Go daemon serves the desktop UI, Docker app management, streamed Linux applications, system telemetry, updates and Tailscale access.
 
 > **Status: pre-release (`0.1.0-dev`).** The UI and core daemon paths are usable, but this repository is **not** a verified 1.0.0 release. Streaming, signed OTA updates, Tailscale Serve/Funnel, app installation and the installable Linux image require hardware or credentials that are not available in this workspace. See [docs/FEATURE-AUDIT.md](docs/FEATURE-AUDIT.md) and [docs/MANUAL-TESTING.md](docs/MANUAL-TESTING.md) before deploying.
