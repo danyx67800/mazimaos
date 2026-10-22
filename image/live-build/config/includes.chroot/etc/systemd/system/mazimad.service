@@ -1,0 +1,32 @@
+[Unit]
+Description=MazimaOS daemon
+After=network-online.target docker.service caddy.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mazima
+Group=mazima
+SupplementaryGroups=docker
+ExecStart=/opt/mazima/current/bin/mazimad --config /etc/mazima/config.json
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=20
+Environment=HOME=/var/lib/mazima
+StateDirectory=mazima
+StateDirectoryMode=0750
+RuntimeDirectory=mazima
+ReadWritePaths=/var/lib/mazima /data /opt/mazima /etc/mazima/caddy
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+
+[Install]
+WantedBy=multi-user.target

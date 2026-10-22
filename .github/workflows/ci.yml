@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: daemon/go.mod
+          cache-dependency-path: daemon/go.sum
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Lint
+        run: make lint
+
+      - name: Go tests
+        run: cd daemon && go test -race ./...
+
+      - name: Build
+        run: make build
+
+      - name: Linux cross-build
+        run: cd daemon && GOOS=linux GOARCH=amd64 go build ./...
+
+      - name: Shell syntax
+        run: |
+          bash -n scripts/*.sh
+          sh -n scripts/backup.sh image/build.sh
+
+      - name: Package smoke test
+        run: |
+          (cd daemon && go run ./cmd/mazimaota keygen -private /tmp/ota.key -public /tmp/ota.pub)
+          MAZIMA_OTA_PRIVATE_KEY=/tmp/ota.key MAZIMA_OTA_PUBLIC_KEY=/tmp/ota.pub ./scripts/release.sh 0.0.1
+
+      - name: Browser E2E
+        run: npm run test:e2e
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore

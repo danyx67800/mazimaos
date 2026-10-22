@@ -1,0 +1,52 @@
+# Build output
+/bin/
+/dist/
+/build/
+*.test
+*.out
+coverage/
+playwright-report/
+test-results/
+
+# Runtime data
+/data/
+/dev-data/
+*.db
+*.db-journal
+*.log
+*.pid
+*.sock
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+!docs/evidence/**/*.pem
+signing/
+secrets/
+
+# Node
+node_modules/
+npm-debug.log*
+.ui-dist/
+
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# End-to-end test data
+.e2e-data/
+
+# Local development data
+.dev-data/
+
+# Local binaries
+/daemon/mazimaota
+/daemon/mazimad
+/daemon/mazimactl

@@ -1,0 +1,22 @@
+{
+	admin localhost:2019
+}
+
+https://mazima.local {
+	tls internal
+	encode zstd gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		X-Frame-Options DENY
+	}
+
+	import /etc/mazima/caddy/apps.caddy
+
+	handle {
+		reverse_proxy 127.0.0.1:8088
+	}
+}
+
+import /etc/mazima/caddy/apps-aliases.caddy

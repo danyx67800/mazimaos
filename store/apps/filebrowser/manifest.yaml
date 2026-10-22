@@ -1,0 +1,26 @@
+id: filebrowser
+name: File Browser
+name_i18n:
+  it: File Browser
+  en: File Browser
+description: Browse and manage files stored on the MazimaOS data volume.
+description_i18n:
+  it: Sfoglia e gestisci i file salvati nel volume dati di MazimaOS.
+  en: Browse and manage files stored on the MazimaOS data volume.
+version: "2"
+category: files
+website: https://filebrowser.org
+license: Apache-2.0
+maintainer: MazimaOS
+port: 80
+proxy:
+  mode: path
+  container_port: 80
+  health_path: /
+  scheme: http
+env:
+  PUID: "1000"
+  PGID: "1000"
+notes:
+  it: I file sono salvati in data/apps/filebrowser/data. Cambia le credenziali al primo accesso.
+  en: Files are stored in data/apps/filebrowser/data. Change the default credentials on first login.

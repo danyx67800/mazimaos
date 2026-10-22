@@ -1,0 +1,12 @@
+[Unit]
+Description=MazimaOS restic backup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/mazima/backup.env
+ExecStart=/usr/local/bin/mazima-backup
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

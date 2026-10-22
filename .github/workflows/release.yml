@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version without the leading v (e.g. 1.0.0)"
+        required: true
+        type: string
+      channel:
+        description: "Update channel"
+        required: true
+        default: stable
+        type: choice
+        options:
+          - stable
+          - beta
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: daemon/go.mod
+          cache-dependency-path: daemon/go.sum
+
+      - name: Restore signing key
+        env:
+          PRIVATE_KEY: ${{ secrets.MAZIMA_OTA_PRIVATE_KEY }}
+          PUBLIC_KEY: ${{ secrets.MAZIMA_OTA_PUBLIC_KEY }}
+        run: |
+          test -n "$PRIVATE_KEY"
+          test -n "$PUBLIC_KEY"
+          mkdir -p signing
+          printf '%s\n' "$PRIVATE_KEY" > signing/ota.key
+          printf '%s\n' "$PUBLIC_KEY" > signing/ota.pub
+          chmod 600 signing/ota.key
+
+      - name: Build, sign and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANNEL: ${{ inputs.channel }}
+          PUBLISH: "1"
+        run: ./scripts/release.sh "${{ inputs.version }}"
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: dist/
+          if-no-files-found: ignore

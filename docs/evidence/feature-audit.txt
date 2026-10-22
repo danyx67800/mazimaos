@@ -1,0 +1,43 @@
+MazimaOS feature audit evidence
+generated: 2026-10-22T12:45:36Z
+host: Darwin 27.0.0 arm64
+go: go version go1.27.3 darwin/arm64
+node: v24.21.0
+npm: 11.19.0
+
+== gofmt ==
+ok
+
+== go vet ==
+ok
+
+== go test -cover ==
+	github.com/danyx67800/mazimaos/daemon/cmd/mazimactl		coverage: 0.0% of statements
+	github.com/danyx67800/mazimaos/daemon/cmd/mazimad		coverage: 0.0% of statements
+ok  	github.com/danyx67800/mazimaos/daemon/cmd/mazimaota	0.337s	coverage: 46.6% of statements
+	github.com/danyx67800/mazimaos/daemon/internal/api		coverage: 0.0% of statements
+ok  	github.com/danyx67800/mazimaos/daemon/internal/audit	0.335s	coverage: 79.0% of statements
+	github.com/danyx67800/mazimaos/daemon/internal/auth		coverage: 0.0% of statements
+	github.com/danyx67800/mazimaos/daemon/internal/config		coverage: 0.0% of statements
+ok  	github.com/danyx67800/mazimaos/daemon/internal/dockerstore	0.220s	coverage: 8.0% of statements
+ok  	github.com/danyx67800/mazimaos/daemon/internal/proxy	0.247s	coverage: 57.5% of statements
+	github.com/danyx67800/mazimaos/daemon/internal/session		coverage: 0.0% of statements
+ok  	github.com/danyx67800/mazimaos/daemon/internal/store	0.260s	coverage: 43.3% of statements
+	github.com/danyx67800/mazimaos/daemon/internal/system		coverage: 0.0% of statements
+	github.com/danyx67800/mazimaos/daemon/internal/tailscale		coverage: 0.0% of statements
+	github.com/danyx67800/mazimaos/daemon/internal/updater		coverage: 0.0% of statements
+	github.com/danyx67800/mazimaos/daemon/internal/version		coverage: 0.0% of statements
+
+== playwright e2e ==
+
+> mazimaos@0.1.0 test:e2e
+> playwright test
+
+[WebServer] mazimad: 2026/10/22 12:45:41 first-run setup token written to /Volumes/dany/MazimaOS/.e2e-data/setup.token (read it locally, never share it)
+[WebServer] mazimad: 2026/10/22 12:45:41 MazimaOS 0.1.0-dev listening on 127.0.0.1:18090
+
+Running 1 test using 1 worker
+
+  ✓  1 tests/e2e/ui.spec.js:13:1 › setup, desktop apps, command palette, theme and login (6.7s)
+
+  1 passed (9.5s)

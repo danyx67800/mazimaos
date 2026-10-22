@@ -1,0 +1,22 @@
+{
+  "listen": "127.0.0.1:8088",
+  "public_url": "https://mazima.local",
+  "data_dir": "/var/lib/mazima",
+  "ui_dir": "/opt/mazima/current/ui",
+  "store_dir": "/opt/mazima/current/store",
+  "install_dir": "/opt/mazima",
+  "apps_dir": "/data/apps",
+  "docker_host": "unix:///var/run/docker.sock",
+  "tailscale_socket": "/var/run/tailscale/tailscaled.sock",
+  "caddy_config_path": "/etc/mazima/caddy/apps.caddy",
+  "trusted_proxy": "127.0.0.1",
+  "insecure_cookies": false,
+  "dev": false,
+  "auto_update": true,
+  "update_repository": "danyx67800/mazimaos",
+  "update_channel": "stable",
+  "update_interval_seconds": 21600,
+  "session_ttl_seconds": 43200,
+  "stream_idle_seconds": 1800,
+  "allowed_origins": ["https://mazima.local"]
+}

@@ -1,0 +1,45 @@
+#!/bin/sh
+set -eu
+
+getent group mazima >/dev/null || groupadd --system mazima
+getent passwd mazima >/dev/null || useradd --system --gid mazima \
+  --home-dir /var/lib/mazima --shell /usr/sbin/nologin mazima
+
+if getent group docker >/dev/null; then
+  usermod -aG docker mazima
+fi
+if getent passwd caddy >/dev/null; then
+  usermod -aG mazima caddy
+fi
+if getent group systemd-journal >/dev/null; then
+  usermod -aG systemd-journal mazima
+fi
+if getent group tailscale >/dev/null; then
+  usermod -aG tailscale mazima
+fi
+
+install -d -o mazima -g mazima -m 0750 /var/lib/mazima /data /data/apps
+install -d -o mazima -g mazima -m 0750 /etc/mazima/caddy
+install -d -o mazima -g mazima -m 0750 /opt/mazima
+chown -R mazima:mazima /opt/mazima
+chmod 0644 /etc/mazima/config.json /etc/mazima/caddy/Caddyfile
+chmod 0644 /etc/mazima/caddy/apps.caddy /etc/mazima/caddy/apps-aliases.caddy
+
+
+ln -sfn /opt/mazima/current/bin/mazimactl /usr/local/bin/mazimactl
+
+systemctl enable docker.service
+systemctl enable caddy.service
+systemctl disable caddy-api.service 2>/dev/null || true
+systemctl enable avahi-daemon.service
+systemctl enable nftables.service
+systemctl enable mazimad.service
+systemctl enable mazima-backup.timer
+systemctl set-default multi-user.target
+
+printf 'mazima\n' > /etc/hostname
+cat > /etc/hosts <<'EOF'
+127.0.0.1 localhost mazima.local
+127.0.1.1 mazima
+::1 localhost ip6-localhost ip6-loopback
+EOF
