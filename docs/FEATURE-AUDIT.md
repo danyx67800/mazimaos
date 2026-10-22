@@ -82,4 +82,4 @@ Status values:
 4. Build and boot the Debian image on x86_64 hardware or a VM.
 5. Install `restic` and verify a restore, not only a backup.
 6. Exercise app install through Caddy with a real Docker host.
-7. Resolve the decisions in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md), especially the license.
+7. Resolve the remaining decisions in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md).

@@ -62,3 +62,7 @@ repository with `RESTIC_INIT=1`. Use a remote repository for disaster recovery.
 ## Security
 
 MazimaOS is intended to be exposed only through a trusted network or a TLS-terminating reverse proxy. Do not expose the daemon directly to the public internet. Setup tokens, the master key and session data are written with restrictive permissions under the data directory; never commit them.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

@@ -2,7 +2,7 @@
 
 These decisions must be resolved before a 1.0.0 release.
 
-1. **License** — no license file exists. Choose one before publishing.
+1. **License** — **RESOLVED 2026-10-22**: MIT, see [`LICENSE`](../LICENSE).
 2. **Repository visibility** — **RESOLVED 2026-10-22**: the owner approved a
    public GitHub repository. It is live at
    <https://github.com/danyx67800/mazimaos>; the initial commit was pushed to
