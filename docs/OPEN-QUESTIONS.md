@@ -16,7 +16,7 @@ These decisions must be resolved before a 1.0.0 release.
 4. **Tailscale Funnel** — public Funnel activation needs explicit approval and
    a reviewed exposure policy. Serve-only is the safer default.
 5. **Supported hardware** — the image targets Debian 13 x86_64 only. Confirm the
-   CPU baseline and whether ARM64 is in scope for 1.0. The `v0.1.0-rc.2` ISO
+   CPU baseline and whether ARM64 is in scope for 1.0. The `v0.1.0-rc.3` ISO
    exists but has not been booted.
 6. **Backups** — a restic script, service and timer now exist, but the
    repository location/credential model is still undecided. The default local

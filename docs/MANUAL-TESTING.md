@@ -30,14 +30,16 @@ any item is `FAIL`, and no `BLOCKED` item may be silently dropped.
 
 ## B. First-run setup and account security
 
-- [ ] B1 `sudo mazimactl setup-token --config /etc/mazima/config.json` prints a
-      token and the file is mode `0600`.
-- [ ] B2 Open `https://mazima.local`; the setup wizard renders and the
-      certificate warning is expected until the local CA is trusted.
-- [ ] B3 Complete setup with hostname, language, timezone, admin username and
-      password. Confirm the dashboard loads.
-- [ ] B4 Re-open the setup URL or reload the token; setup is no longer
-      available and `/var/lib/mazima/setup.token` is gone.
+- [ ] B1 On a fresh ISO boot, `mazima-setup.service` starts on `tty1` before
+      the login prompt and the guided console wizard appears.
+- [ ] B2 Choose language, timezone, admin username, display name and a valid
+      password. Confirm the success screen, then verify
+      `/var/lib/mazima/setup.token` is gone.
+- [ ] B3 Reboot; the wizard does not reappear and the setup URL reports setup
+      as complete.
+- [ ] B4 On a fresh boot, cancel the wizard and log in as `user` / `live`.
+      Verify `sudo mazimactl setup-token --config /etc/mazima/config.json`
+      prints a token and the file is mode `0600`; then complete the web setup.
 - [ ] B5 Log out, open a private window and log in again. The session cookie is
       `HttpOnly`, `Secure` and `SameSite` as designed.
 - [ ] B6 Enter a wrong password repeatedly; the API returns 401 and the UI

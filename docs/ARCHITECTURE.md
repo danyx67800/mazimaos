@@ -6,6 +6,9 @@ MazimaOS is one Go daemon plus a static browser application.
 
 - `mazimad` serves the UI, REST API, WebSocket session endpoint and `/healthz`.
 - `mazimactl` provides local operations (`version`, `selftest`, `setup-token`).
+- `mazima-setup.service` starts a guided console wizard on `tty1` before the
+  login prompt on first boot; it uses the local setup API and the token in
+  `/var/lib/mazima/setup.token`.
 - State is stored as atomic JSON documents under the configured data directory.
 - The browser desktop is plain ES modules; there is no UI build step.
 

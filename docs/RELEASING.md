@@ -79,9 +79,9 @@ anchor.
 The OTA bundle can be added to the same prerelease:
 
 ```sh
-./scripts/release.sh 0.1.0-rc.2
-gh release upload v0.1.0-rc.2 \
-  dist/mazima-0.1.0-rc.2-linux-amd64.tar.gz \
+./scripts/release.sh 0.1.0-rc.3
+gh release upload v0.1.0-rc.3 \
+  dist/mazima-0.1.0-rc.3-linux-amd64.tar.gz \
   dist/mazima-manifest.json \
   dist/mazima-manifest.json.sig
 ```

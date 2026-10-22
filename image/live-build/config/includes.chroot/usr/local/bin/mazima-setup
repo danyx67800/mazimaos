@@ -1,0 +1,255 @@
+#!/bin/sh
+set -eu
+umask 077
+
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export TERM="${TERM:-linux}"
+
+TITLE="MazimaOS"
+API="${MAZIMA_API:-http://127.0.0.1:8088}"
+CONFIG="${MAZIMA_CONFIG:-/etc/mazima/config.json}"
+TOKEN_FILE="${MAZIMA_SETUP_TOKEN_FILE:-/var/lib/mazima/setup.token}"
+WHIPTAIL=$(command -v whiptail || true)
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT HUP INT TERM
+
+status() {
+	curl -fsS --max-time 2 "$API/api/setup/status" 2>/dev/null
+}
+
+complete() {
+	status | jq -e '.setup_complete == true' >/dev/null 2>&1
+}
+
+fallback() {
+	token=""
+	if [ -r "$TOKEN_FILE" ]; then
+		token=$(tr -d '\r\n' <"$TOKEN_FILE")
+	fi
+	printf '\nMazimaOS first-boot setup\n\n'
+	printf 'Open https://mazima.local from another device on the same network.\n'
+	if [ -n "$token" ]; then
+		printf 'Setup token: %s\n' "$token"
+	else
+		printf 'Run: sudo mazimactl setup-token --config %s\n' "$CONFIG"
+	fi
+	printf '\nThe token is only valid until the first administrator is created.\n\n'
+}
+
+cancel() {
+	fallback
+	exit 0
+}
+
+case "${1:-}" in
+--check)
+	if complete; then
+		exit 1
+	fi
+	exit 0
+	;;
+--token)
+	fallback
+	exit 0
+	;;
+--help | -h)
+	printf 'usage: mazima-setup [--check|--token]\n'
+	exit 0
+	;;
+"") ;;
+*)
+	printf 'mazima-setup: unknown argument %s\n' "$1" >&2
+	exit 2
+	;;
+esac
+
+if [ -z "$WHIPTAIL" ]; then
+	fallback
+	exit 1
+fi
+
+i=0
+while ! status >"$TMP/status.json"; do
+	i=$((i + 1))
+	if [ "$i" -ge 60 ]; then
+		fallback
+		exit 1
+	fi
+	sleep 1
+done
+if jq -e '.setup_complete == true' "$TMP/status.json" >/dev/null 2>&1; then
+	exit 0
+fi
+
+LANG_CODE=$("$WHIPTAIL" --title "$TITLE" --menu "Choose language / Scegli la lingua" 15 60 2 \
+	it "Italiano" en "English" 3>&1 1>&2 2>&3) || cancel
+
+case "$LANG_CODE" in
+it)
+	L_WELCOME="Benvenuto in MazimaOS.
+
+Questo assistente crea il primo amministratore.
+Il server sarà raggiungibile su https://mazima.local.
+"
+	L_TIMEZONE="Fuso orario (es. Europe/Rome):"
+	L_TZ_LABEL="Fuso orario"
+	L_BAD_TZ="Fuso orario non valido. Usa un nome IANA, ad esempio Europe/Rome."
+	L_USERNAME="Nome utente amministratore:"
+	L_BAD_USER="Usa 3-32 caratteri: inizia con una lettera minuscola; poi lettere minuscole, numeri, trattino o underscore."
+	L_DISPLAY="Nome visualizzato (facoltativo):"
+	L_DISPLAY_DEFAULT="Amministratore"
+	L_PASSWORD="Password amministratore (almeno 12 caratteri):"
+	L_PASSWORD2="Ripeti la password:"
+	L_WEAK="Password troppo debole: servono almeno 12 caratteri e tre categorie tra minuscole, maiuscole, numeri e simboli."
+	L_MISMATCH="Le password non coincidono."
+	L_LANGUAGE="Lingua"
+	L_ADMIN="Amministratore"
+	L_SUMMARY="Riepilogo della configurazione"
+	L_CONTINUE="Continuare?"
+	L_TOKEN_MISSING="Token di setup non trovato. La configurazione web resta disponibile su https://mazima.local."
+	L_NETWORK="Impossibile contattare mazimad. Controlla il servizio e riprova."
+	L_FAILED="Configurazione non riuscita"
+	L_TZ_WARN="Attenzione: il fuso orario non è stato applicato al sistema."
+	L_DONE="Configurazione completata.
+
+Apri https://mazima.local da un altro dispositivo e accedi come %s.
+Il server è pronto. Premi Invio per uscire.
+"
+	;;
+*)
+	L_WELCOME="Welcome to MazimaOS.
+
+This wizard creates the first administrator.
+The server will be available at https://mazima.local.
+"
+	L_TIMEZONE="Timezone (e.g. Europe/Rome):"
+	L_TZ_LABEL="Timezone"
+	L_BAD_TZ="Invalid timezone. Use an IANA name such as Europe/Rome."
+	L_USERNAME="Administrator username:"
+	L_BAD_USER="Use 3-32 characters: start with a lowercase letter; then lowercase letters, digits, dash or underscore."
+	L_DISPLAY="Display name (optional):"
+	L_DISPLAY_DEFAULT="Administrator"
+	L_PASSWORD="Administrator password (at least 12 characters):"
+	L_PASSWORD2="Repeat the password:"
+	L_WEAK="Password is too weak: use at least 12 characters and three of lowercase, uppercase, digits and symbols."
+	L_MISMATCH="The passwords do not match."
+	L_LANGUAGE="Language"
+	L_ADMIN="Administrator"
+	L_SUMMARY="Configuration summary"
+	L_CONTINUE="Continue?"
+	L_TOKEN_MISSING="Setup token not found. The browser setup remains available at https://mazima.local."
+	L_NETWORK="Cannot reach mazimad. Check the service and retry."
+	L_FAILED="Setup failed"
+	L_TZ_WARN="Warning: the system timezone was not applied."
+	L_DONE="Setup complete.
+
+Open https://mazima.local from another device and sign in as %s.
+The server is ready. Press Enter to exit.
+"
+	;;
+esac
+
+case "$LANG_CODE" in
+it) LANG_LABEL="Italiano" ;;
+*) LANG_LABEL="English" ;;
+esac
+
+"$WHIPTAIL" --title "$TITLE" --msgbox "$L_WELCOME" 12 72
+
+DEFAULT_TZ=$(cat /etc/timezone 2>/dev/null || printf 'Europe/Rome')
+if [ -z "$DEFAULT_TZ" ]; then
+	DEFAULT_TZ="Europe/Rome"
+fi
+while :; do
+	TIMEZONE=$("$WHIPTAIL" --title "$TITLE" --inputbox "$L_TIMEZONE" 10 64 "$DEFAULT_TZ" 3>&1 1>&2 2>&3) || cancel
+	case "$TIMEZONE" in
+	"" | /* | *..*) valid=0 ;;
+	*) [ -f "/usr/share/zoneinfo/$TIMEZONE" ] && valid=1 || valid=0 ;;
+	esac
+	if [ "$valid" = 1 ]; then
+		break
+	fi
+	"$WHIPTAIL" --title "$TITLE" --msgbox "$L_BAD_TZ" 8 64
+done
+
+while :; do
+	USERNAME=$("$WHIPTAIL" --title "$TITLE" --inputbox "$L_USERNAME" 10 64 "admin" 3>&1 1>&2 2>&3) || cancel
+	USERNAME=$(printf '%s' "$USERNAME" | tr '[:upper:]' '[:lower:]')
+	if printf '%s' "$USERNAME" | grep -Eq '^[a-z][a-z0-9_-]{2,31}$'; then
+		break
+	fi
+	"$WHIPTAIL" --title "$TITLE" --msgbox "$L_BAD_USER" 8 64
+done
+
+DISPLAY_NAME=$("$WHIPTAIL" --title "$TITLE" --inputbox "$L_DISPLAY" 10 64 "$L_DISPLAY_DEFAULT" 3>&1 1>&2 2>&3) || cancel
+if [ -z "$DISPLAY_NAME" ]; then
+	DISPLAY_NAME="$USERNAME"
+fi
+
+while :; do
+	PASSWORD=$("$WHIPTAIL" --title "$TITLE" --passwordbox "$L_PASSWORD" 10 64 "" 3>&1 1>&2 2>&3) || cancel
+	n=0
+	if [ "${#PASSWORD}" -ge 12 ]; then
+		if printf '%s' "$PASSWORD" | grep -q '[a-z]'; then n=$((n + 1)); fi
+		if printf '%s' "$PASSWORD" | grep -q '[A-Z]'; then n=$((n + 1)); fi
+		if printf '%s' "$PASSWORD" | grep -q '[0-9]'; then n=$((n + 1)); fi
+		if printf '%s' "$PASSWORD" | grep -q '[^A-Za-z0-9]'; then n=$((n + 1)); fi
+	fi
+	if [ "$n" -lt 3 ]; then
+		"$WHIPTAIL" --title "$TITLE" --msgbox "$L_WEAK" 10 72
+		continue
+	fi
+	PASSWORD2=$("$WHIPTAIL" --title "$TITLE" --passwordbox "$L_PASSWORD2" 10 64 "" 3>&1 1>&2 2>&3) || cancel
+	if [ "$PASSWORD" != "$PASSWORD2" ]; then
+		"$WHIPTAIL" --title "$TITLE" --msgbox "$L_MISMATCH" 8 64
+		continue
+	fi
+	break
+done
+
+SUMMARY=$(printf '%s\n\n%s: %s\n%s: %s\n%s: %s\n\n%s' \
+	"$L_SUMMARY" "$L_LANGUAGE" "$LANG_LABEL" "$L_TZ_LABEL" "$TIMEZONE" "$L_ADMIN" "$USERNAME" "$L_CONTINUE")
+"$WHIPTAIL" --title "$TITLE" --yesno "$SUMMARY" 16 72 || cancel
+
+TOKEN=$(tr -d '\r\n' <"$TOKEN_FILE" 2>/dev/null || true)
+if [ -z "$TOKEN" ]; then
+	"$WHIPTAIL" --title "$TITLE" --msgbox "$L_TOKEN_MISSING" 10 72
+	exit 1
+fi
+
+printf '%s' "$TOKEN" >"$TMP/token"
+printf '%s' "$PASSWORD" >"$TMP/password"
+jq -n \
+	--rawfile token "$TMP/token" \
+	--rawfile password "$TMP/password" \
+	--arg username "$USERNAME" \
+	--arg display_name "$DISPLAY_NAME" \
+	--arg language "$LANG_CODE" \
+	--arg timezone "$TIMEZONE" \
+	--arg hostname "mazima" \
+	'{setup_token:$token,username:$username,display_name:$display_name,password:$password,language:$language,timezone:$timezone,hostname:$hostname}' \
+	>"$TMP/payload.json"
+
+if ! HTTP=$(curl -sS --max-time 20 -o "$TMP/response.json" -w '%{http_code}' \
+	-H 'Content-Type: application/json' --data-binary @"$TMP/payload.json" "$API/api/setup" 2>/dev/null); then
+	"$WHIPTAIL" --title "$TITLE" --msgbox "$L_NETWORK" 10 72
+	exit 1
+fi
+if [ "$HTTP" != "201" ]; then
+	ERROR=$(jq -r '.error // .code // "unknown error"' "$TMP/response.json" 2>/dev/null || printf 'unknown error')
+	"$WHIPTAIL" --title "$TITLE" --msgbox "$L_FAILED:
+$ERROR" 12 72
+	exit 1
+fi
+
+TZ_WARN=""
+if command -v timedatectl >/dev/null 2>&1; then
+	if ! timedatectl set-timezone "$TIMEZONE" >/dev/null 2>&1; then
+		TZ_WARN="
+
+$L_TZ_WARN"
+	fi
+fi
+
+"$WHIPTAIL" --title "$TITLE" --msgbox "$(printf "$L_DONE" "$USERNAME")$TZ_WARN" 14 72
+exit 0

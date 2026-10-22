@@ -34,18 +34,30 @@ mDNS (Avahi), or add it to the client's hosts file. Caddy uses its internal CA,
 so the first browser visit shows a certificate warning until the local root CA
 is trusted.
 
-The live session uses the standard Debian live credentials (`user` / `live` by
-default). `mazima` is a service account with `/usr/sbin/nologin`; do not use it
-for console login. If the console asks for a login and `user` is rejected, the
-image is missing `user-setup` and must be rebuilt. On the console:
+On the first boot, `mazima-setup.service` runs on `tty1` before the login
+prompt and starts a guided console wizard. It asks for language, timezone,
+administrator username, display name and password, then creates the first
+administrator through the local API. The setup token is read from
+`/var/lib/mazima/setup.token` and is removed after success. The timezone is
+applied with `timedatectl`.
+
+The wizard keeps the hostname `mazima`, so the browser URL is
+`https://mazima.local`. Changing the OS hostname safely is not implemented yet.
+
+If you cancel the wizard, or need to configure from another device, log in on
+the console with the standard Debian live credentials (`user` / `live` by
+default) and run:
 
 ```sh
 sudo mazimactl setup-token --config /etc/mazima/config.json
 ```
 
 Open `https://mazima.local`, paste the token and create the administrator
-account. Disable console autologin or change the live user password before
-putting the machine on an untrusted network.
+account. `mazima` is a service account with `/usr/sbin/nologin`; do not use it
+for console login. If the console asks for a login and `user` is rejected, the
+image is missing `user-setup` and must be rebuilt. Disable console autologin or
+change the live user password before putting the machine on an untrusted
+network.
 
 ## Persistence
 

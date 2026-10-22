@@ -1,0 +1,22 @@
+[Unit]
+Description=MazimaOS guided first-boot setup
+After=mazimad.service
+Before=getty@tty1.service
+
+[Service]
+Type=oneshot
+ExecCondition=/usr/local/bin/mazima-setup --check
+ExecStart=/usr/local/bin/mazima-setup
+StandardInput=tty
+StandardOutput=tty
+StandardError=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+TimeoutStartSec=15min
+Restart=no
+Environment=LANG=C.UTF-8 TERM=linux
+
+[Install]
+WantedBy=multi-user.target

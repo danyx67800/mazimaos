@@ -31,6 +31,7 @@ dnsutils
 chrony
 locales
 console-setup
+whiptail
 keyboard-configuration
 fonts-dejavu-core
 xvfb

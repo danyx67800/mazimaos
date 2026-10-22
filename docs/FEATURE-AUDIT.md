@@ -1,7 +1,7 @@
 # Feature audit
 
 Audit date: 2026-10-22
-Target: `0.1.0-rc.2` (do not tag `v1.0.0` until the gaps below are closed)
+Target: `0.1.0-rc.3` (do not tag `v1.0.0` until the gaps below are closed)
 
 Status values:
 
@@ -20,14 +20,15 @@ Status values:
 | Browser E2E | `npm run test:e2e` |
 | Full audit log | `make audit` → `docs/evidence/feature-audit.txt` |
 | PWA check | E2E asserts active service worker, scope and `mazima-shell-v2` cache |
-| OTA bundle | `./scripts/release.sh 0.1.0-rc.2` (manifest + Ed25519 signature + verification) |
-| Published prerelease | [`v0.1.0-rc.2`](https://github.com/danyx67800/mazimaos/releases/tag/v0.1.0-rc.2): ISO 1,302,233,088 bytes, OTA bundle and signature; manifest reverified after download |
+| OTA bundle | `./scripts/release.sh 0.1.0-rc.3` (manifest + Ed25519 signature + verification) |
+| Published prerelease | [`v0.1.0-rc.2`](https://github.com/danyx67800/mazimaos/releases/tag/v0.1.0-rc.2): ISO 1,302,233,088 bytes, OTA bundle and signature; `rc.3` guided-setup ISO pending |
 | Store catalog | `go test -count=1 ./internal/dockerstore -run TestBundledCatalogManifests` |
 | Caddy snippet split | `go test ./internal/proxy -run TestRegenerateSeparatesPathAndAliasSnippets` |
 | Backup argument flow | Stubbed `restic` exercised `scripts/backup.sh`; real repo/restore not run |
 | CI | GitHub Actions run [39781882015](https://github.com/danyx67800/mazimaos/actions/runs/39781882015) passed (8m4s) |
 | Live-build config | `lb config` passed in a Debian trixie container (amd64 config generated on arm64) |
 | ISO build | GitHub Actions run [39812732075](https://github.com/danyx67800/mazimaos/actions/runs/39812732075) built `mazima-0.1.0-rc.2-amd64.iso` (1.3G) with `user-setup` and verified its SHA-256; boot not tested |
+| Guided setup script | Stub `whiptail` + real `mazimad` created an admin, removed `setup.token`, and produced the expected API payload; `tty1` boot path not tested |
 | Manual matrix | [MANUAL-TESTING.md](MANUAL-TESTING.md) |
 
 ## Matrix
@@ -35,6 +36,7 @@ Status values:
 | Area | Status | Evidence / gap |
 | --- | --- | --- |
 | First-run setup (hostname, language, timezone, admin, token) | VERIFICATO | `tests/e2e/ui.spec.js` completes setup from a fresh data directory |
+| Guided first-boot console setup | PARZIALE | Script creates the admin against a real daemon with a stub `whiptail`; the systemd `tty1` path has not been booted |
 | Login and logout | VERIFICATO | E2E logs out through the user menu and logs back in |
 | Session cookie and CSRF handling | PARZIALE | Used by every E2E request; no dedicated negative/expiry tests |
 | TOTP enrollment, login challenge and recovery | NON VERIFICATO | No E2E coverage; needs an authenticator flow |
@@ -60,7 +62,7 @@ Status values:
 | App install/remove through Caddy | PARZIALE | Manifest/compose validate; Docker Compose plugin is broken on the audit host and Caddy is not installed |
 | Caddy path/alias generation | PARZIALE | Unit test verifies separate `apps.caddy`/`apps-aliases.caddy`; no live reload tested |
 | Backups | PARZIALE | Script argument flow tested with a stub; `restic` is not installed and restore was not run |
-| Debian live image and first boot | PARZIALE | `rc.1` lacked `user-setup` (console login failed); `rc.2` adds it and builds a checksum-verified 1.3G ISO, but it has not been booted |
+| Debian live image and first boot | PARZIALE | `rc.1` lacked `user-setup` (console login failed); `rc.2` adds it; `rc.3` adds the guided console wizard and builds a checksum-verified 1.3G ISO, but it has not been booted |
 | x86_64 hardware and GPU telemetry | NON VERIFICATO | Audit host is ARM64 macOS |
 | CI pipeline | VERIFICATO | GitHub Actions run [39781882015](https://github.com/danyx67800/mazimaos/actions/runs/39781882015) passed |
 

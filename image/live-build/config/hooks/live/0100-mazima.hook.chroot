@@ -24,6 +24,7 @@ install -d -o mazima -g mazima -m 0750 /opt/mazima
 chown -R mazima:mazima /opt/mazima
 chmod 0644 /etc/mazima/config.json /etc/mazima/caddy/Caddyfile
 chmod 0644 /etc/mazima/caddy/apps.caddy /etc/mazima/caddy/apps-aliases.caddy
+chmod 0755 /usr/local/bin/mazima-setup
 
 
 ln -sfn /opt/mazima/current/bin/mazimactl /usr/local/bin/mazimactl
@@ -34,6 +35,7 @@ systemctl disable caddy-api.service 2>/dev/null || true
 systemctl enable avahi-daemon.service
 systemctl enable nftables.service
 systemctl enable mazimad.service
+systemctl enable mazima-setup.service
 systemctl enable mazima-backup.timer
 systemctl set-default multi-user.target
 
