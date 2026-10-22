@@ -62,6 +62,7 @@ cp -a "$ROOT/store" "$DEST/store"
 printf '%s\n' "$VERSION" > "$DEST/VERSION"
 chmod 0644 "$DEST/VERSION"
 ln -sfn "releases/$VERSION" "$BUILD/config/includes.chroot/opt/mazima/current"
+install -d "$BUILD/config/includes.chroot/usr/local/bin"
 install -m 0755 "$ROOT/scripts/backup.sh" "$BUILD/config/includes.chroot/usr/local/bin/mazima-backup"
 install -d "$BUILD/config/includes.chroot/var/backups/mazima"
 
