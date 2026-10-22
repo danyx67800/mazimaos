@@ -25,7 +25,8 @@ Status values:
 | Caddy snippet split | `go test ./internal/proxy -run TestRegenerateSeparatesPathAndAliasSnippets` |
 | Backup argument flow | Stubbed `restic` exercised `scripts/backup.sh`; real repo/restore not run |
 | CI | GitHub Actions run [39781882015](https://github.com/danyx67800/mazimaos/actions/runs/39781882015) passed (8m4s) |
-| Live-build config | `lb config` passed in a Debian trixie container (amd64 config generated on arm64); ISO not built |
+| Live-build config | `lb config` passed in a Debian trixie container (amd64 config generated on arm64) |
+| ISO build | GitHub Actions run [39786489204](https://github.com/danyx67800/mazimaos/actions/runs/39786489204) built `mazima-0.1.0-rc.1-amd64.iso` (1.3G) and verified its SHA-256; boot not tested |
 | Manual matrix | [MANUAL-TESTING.md](MANUAL-TESTING.md) |
 
 ## Matrix
@@ -58,7 +59,7 @@ Status values:
 | App install/remove through Caddy | PARZIALE | Manifest/compose validate; Docker Compose plugin is broken on the audit host and Caddy is not installed |
 | Caddy path/alias generation | PARZIALE | Unit test verifies separate `apps.caddy`/`apps-aliases.caddy`; no live reload tested |
 | Backups | PARZIALE | Script argument flow tested with a stub; `restic` is not installed and restore was not run |
-| Debian live image and first boot | NON VERIFICATO | Configs, `lb config` and build script exist; no ISO was built or booted |
+| Debian live image and first boot | PARZIALE | GitHub Actions built a checksum-verified 1.3G amd64 ISO; it has not been booted |
 | x86_64 hardware and GPU telemetry | NON VERIFICATO | Audit host is ARM64 macOS |
 | CI pipeline | VERIFICATO | GitHub Actions run [39781882015](https://github.com/danyx67800/mazimaos/actions/runs/39781882015) passed |
 
@@ -79,7 +80,7 @@ Status values:
 1. Run the Linux streaming integration on a supported host and record evidence.
 2. Move the OTA private key into the release secret store, build a real signed release, and test install plus rollback.
 3. Authenticate Tailscale and verify Serve; verify Funnel only with explicit approval.
-4. Build and boot the Debian image on x86_64 hardware or a VM.
+4. Boot the built ISO on x86_64 hardware or a VM in both UEFI and legacy mode.
 5. Install `restic` and verify a restore, not only a backup.
 6. Exercise app install through Caddy with a real Docker host.
 7. Resolve the remaining decisions in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md).

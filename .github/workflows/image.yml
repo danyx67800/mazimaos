@@ -72,13 +72,16 @@ jobs:
           set -euo pipefail
           asset="dist/mazima-${VERSION}-amd64.iso"
           checksum="${asset}.sha256"
-          notes="dist/release-notes.md"
-          cat > "$notes" <<EOF
+          notes="docs/releases/${VERSION}.md"
+          if [ ! -f "$notes" ]; then
+            notes="dist/release-notes.md"
+            cat > "$notes" <<EOF
           MazimaOS ${VERSION} image prerelease.
 
-          This is an unsigned-by-hardware-test live ISO. See docs/MANUAL-TESTING.md
+          This live ISO has not been boot-tested. See docs/MANUAL-TESTING.md
           before installing or exposing it to a network.
           EOF
+          fi
           if gh release view "v${VERSION}" >/dev/null 2>&1; then
             gh release upload "v${VERSION}" "$asset" "$checksum" --clobber
           else

@@ -67,6 +67,28 @@ sha256sum mazima.tar.gz
 
 The hash and size must match `manifest.json`.
 
+## Image prerelease
+
+The **Image** workflow builds the Debian ISO on an x86_64 GitHub runner inside
+a privileged Debian trixie container. Run it manually with the version and
+`publish=true`; it creates or updates the matching GitHub prerelease and
+uploads the ISO plus SHA-256 file. The ISO is built with
+`MAZIMA_OTA_PUBLIC_KEY`; without that repository secret it has no update trust
+anchor.
+
+The OTA bundle can be added to the same prerelease:
+
+```sh
+./scripts/release.sh 0.1.0-rc.1
+gh release upload v0.1.0-rc.1 \
+  dist/mazima-0.1.0-rc.1-linux-amd64.tar.gz \
+  dist/mazima-manifest.json \
+  dist/mazima-manifest.json.sig
+```
+
+Do not describe an image prerelease as 1.0.0 until the manual matrix in
+[MANUAL-TESTING.md](MANUAL-TESTING.md) is complete.
+
 ## Rotation and revocation
 
 There is no online revocation in `0.1.x`. To rotate the key, ship an image or
