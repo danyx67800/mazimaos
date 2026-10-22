@@ -1,7 +1,7 @@
 # Feature audit
 
 Audit date: 2026-10-22
-Target: `0.1.0-rc.1` (do not tag `v1.0.0` until the gaps below are closed)
+Target: `0.1.0-rc.2` (do not tag `v1.0.0` until the gaps below are closed)
 
 Status values:
 
@@ -20,14 +20,14 @@ Status values:
 | Browser E2E | `npm run test:e2e` |
 | Full audit log | `make audit` → `docs/evidence/feature-audit.txt` |
 | PWA check | E2E asserts active service worker, scope and `mazima-shell-v2` cache |
-| OTA bundle | `./scripts/release.sh 0.1.0-rc.1` (manifest + Ed25519 signature + verification) |
-| Published prerelease | [`v0.1.0-rc.1`](https://github.com/danyx67800/mazimaos/releases/tag/v0.1.0-rc.1): ISO 1,302,233,088 bytes, OTA bundle and signature; manifest reverified after download |
+| OTA bundle | `./scripts/release.sh 0.1.0-rc.2` (manifest + Ed25519 signature + verification) |
+| Published prerelease | [`v0.1.0-rc.2`](https://github.com/danyx67800/mazimaos/releases/tag/v0.1.0-rc.2): ISO 1,302,233,088 bytes, OTA bundle and signature; manifest reverified after download |
 | Store catalog | `go test -count=1 ./internal/dockerstore -run TestBundledCatalogManifests` |
 | Caddy snippet split | `go test ./internal/proxy -run TestRegenerateSeparatesPathAndAliasSnippets` |
 | Backup argument flow | Stubbed `restic` exercised `scripts/backup.sh`; real repo/restore not run |
 | CI | GitHub Actions run [39781882015](https://github.com/danyx67800/mazimaos/actions/runs/39781882015) passed (8m4s) |
 | Live-build config | `lb config` passed in a Debian trixie container (amd64 config generated on arm64) |
-| ISO build | GitHub Actions run [39786489204](https://github.com/danyx67800/mazimaos/actions/runs/39786489204) built `mazima-0.1.0-rc.1-amd64.iso` (1.3G) and verified its SHA-256; boot not tested |
+| ISO build | GitHub Actions run [39812732075](https://github.com/danyx67800/mazimaos/actions/runs/39812732075) built `mazima-0.1.0-rc.2-amd64.iso` (1.3G) with `user-setup` and verified its SHA-256; boot not tested |
 | Manual matrix | [MANUAL-TESTING.md](MANUAL-TESTING.md) |
 
 ## Matrix
@@ -60,12 +60,15 @@ Status values:
 | App install/remove through Caddy | PARZIALE | Manifest/compose validate; Docker Compose plugin is broken on the audit host and Caddy is not installed |
 | Caddy path/alias generation | PARZIALE | Unit test verifies separate `apps.caddy`/`apps-aliases.caddy`; no live reload tested |
 | Backups | PARZIALE | Script argument flow tested with a stub; `restic` is not installed and restore was not run |
-| Debian live image and first boot | PARZIALE | GitHub Actions built a checksum-verified 1.3G amd64 ISO; it has not been booted |
+| Debian live image and first boot | PARZIALE | `rc.1` lacked `user-setup` (console login failed); `rc.2` adds it and builds a checksum-verified 1.3G ISO, but it has not been booted |
 | x86_64 hardware and GPU telemetry | NON VERIFICATO | Audit host is ARM64 macOS |
 | CI pipeline | VERIFICATO | GitHub Actions run [39781882015](https://github.com/danyx67800/mazimaos/actions/runs/39781882015) passed |
 
 ## Known defects fixed during this audit
 
+- `0.1.0-rc.1` omitted the Debian `user-setup` package, so live-config never
+  created the console user and login failed with `Authentication failure`.
+  `0.1.0-rc.2` installs `user-setup`; the live credentials are `user` / `live`.
 - Double-applied window transparency caused unreadable stacked windows; replaced with per-theme `--glass-base` alpha formulas.
 - Window restore pruned not-yet-restored windows through premature `persist()` calls; restore now suppresses saves until the loop completes.
 - Missing static assets fell back to `index.html` with HTTP 200; they now return 404. Asset caching changed to `no-cache` because filenames are not fingerprinted.
